@@ -1,0 +1,53 @@
+-----------------------------------RESPOSTA_1-----------------------------------
+
+SELECT ID_VENDEDOR AS id, 
+       NOME AS nome, 
+       SALARIO AS salario
+FROM VENDEDORES
+WHERE INATIVO = FALSE
+ORDER BY NOME ASC;
+
+-----------------------------------RESPOSTA_2-----------------------------------
+
+SELECT ID_VENDEDOR AS id, 
+       NOME AS nome, 
+       SALARIO AS salario
+FROM VENDEDORES
+WHERE SALARIO > (SELECT AVG(SALARIO) FROM VENDEDORES)
+ORDER BY SALARIO DESC;
+
+-----------------------------------RESPOSTA_3-----------------------------------
+
+SELECT c.ID_CLIENTE AS id,
+       c.RAZAO_SOCIAL AS razao_social,
+       COALESCE(SUM(p.VALOR_TOTAL), 0) AS total
+FROM CLIENTES c
+LEFT JOIN PEDIDO p ON c.ID_CLIENTE = p.ID_CLIENTE
+GROUP BY c.ID_CLIENTE, c.RAZAO_SOCIAL
+ORDER BY total DESC;
+
+-----------------------------------RESPOSTA_4-----------------------------------
+
+SELECT ID_PEDIDO AS id,
+       VALOR_TOTAL AS valor,
+       DATA_EMISSAO AS data,
+       CASE 
+           WHEN DATA_CANCELAMENTO IS NOT NULL THEN 'CANCELADO'
+           WHEN DATA_FATURAMENTO IS NOT NULL THEN 'FATURADO'
+           ELSE 'PENDENTE'
+       END AS situacao
+FROM PEDIDO;
+
+-----------------------------------RESPOSTA_5-----------------------------------
+
+SELECT i.ID_PRODUTO AS id_produto,
+       SUM(i.QUANTIDADE) AS quantidade_vendida,
+       SUM(i.QUANTIDADE * i.PRECO_PRATICADO) AS total_vendido,
+       COUNT(DISTINCT p.ID_PEDIDO) AS pedidos,
+       COUNT(DISTINCT c.ID_CLIENTE) AS clientes
+FROM ITENS_PEDIDO i
+JOIN PEDIDO p ON i.ID_PEDIDO = p.ID_PEDIDO
+JOIN CLIENTES c ON p.ID_CLIENTE = c.ID_CLIENTE
+GROUP BY i.ID_PRODUTO
+ORDER BY quantidade_vendida DESC, total_vendido DESC
+LIMIT 1;
